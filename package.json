@@ -17,7 +17,11 @@
     "Maya",
     "Python"
   ],
-  "author": "Balakrishnan <balki@live.com> (Balki)",
+  "author": {
+    "name": "Balakrishnan (Balki) Ranganathan",
+    "email": "balki@live.com",
+    "url": "http://greymind.com/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bsrealm/GreymindSequencer/issues"
