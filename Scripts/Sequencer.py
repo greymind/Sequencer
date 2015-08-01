@@ -432,14 +432,29 @@ class SequencerUI:
         
     def Export(self, extraArg=None):
         directoryName = os.path.dirname(Cmds.file(q=True, sn=True))
+        if not directoryName:
+            self.MessageBox('Please save Maya file before exporting.')
+            return
+            
+        selectedCount = self.CountSelected()
+        if selectedCount == 0:
+            self.MessageBox('Please select animations to export!')
+            return
+            
         now = datetime.datetime.now()
         exportFilename = "%s/Export %d%d%d-%d%d%d.csv" % (directoryName, now.year, now.month, now.day, now.hour, now.minute, now.second)
         exportFile = open(exportFilename, "w")
         
+        exportFile.write("%s, %s, %s\n" % ('Animation Name', 'Start Frame', 'End Frame'))
         for animation in self.sequencer.Animations.values():
-            exportFile.write("%s, %d, %d\n" % (animation.Name, animation.StartFrame, animation.EndFrame))
+            if animation.Selected == True:
+                exportFile.write("%s, %d, %d\n" % (animation.Name, animation.StartFrame, animation.EndFrame))
         
         exportFile.close()
+        
+        choice = Cmds.confirmDialog(title='Export Complete!', message='Do you want to open the file %s now?' % (exportFilename), button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+        if choice == 'Yes':
+            os.startfile(exportFilename)
         
     def GeneratePlayblast(self, extraArg=None):
         prefixText = Cmds.textField(self.prefixTextBox, q=True, text=True)
@@ -459,6 +474,9 @@ class SequencerUI:
         self.PlayblastDisplayEnable(False)
         
         directoryName = os.path.dirname(Cmds.file(q=True, sn=True))
+        if not directoryName:
+            self.MessageBox('Please save Maya file before blasting!')
+            return
         
         selectedCount = self.CountSelected()
         if selectedCount == 0:
