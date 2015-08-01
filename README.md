@@ -23,9 +23,13 @@ You will have to first set up your preferred export settings and then use the Se
 export functionality. Safest way to do so is to export the full file once to a temporary
 file with the FBX settings set correctly and verify.
 
-## Fixing Issues
+## Troubleshooting
 If you need to clean up Sequencer, issue the following command in the MEL mode of the script editor:
 
 ```python 
 delete SequencerData;
 ```
+
+## Team
+* Balakrishnan (Balki) Ranganathan
+* Scott John Easley
