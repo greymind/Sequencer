@@ -236,7 +236,7 @@ def FindIndexOf(list, value, start=0, end=-1):
 
 '''
 Greymind Sequencer for Maya
-Version: 1.7.1
+Version: 1.7.2
 
 (c) 2009 - 2015 Greymind Inc.
     Balakrishnan (Balki) Ranganathan (balki_live_com)
@@ -246,7 +246,7 @@ Version: 1.7.1
 # from Common import *
 from functools import partial as Partial
 
-SequencerVersion = "1.7.1"
+SequencerVersion = "1.7.2"
 
 class Animation:
     Id = -1
