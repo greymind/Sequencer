@@ -2,7 +2,7 @@
 Helps manage animations and related actions in Maya.
 
 ## Installation
-Place this file in the `Documents\maya\<maya version>\scripts` folder.
+Place the `Sequencer.py` file from the `Out` directory in the `Documents\maya\<maya version>\scripts` folder.
 
 ## Usage
 To invoke this script, use the following commands in the python mode of the script editor:
