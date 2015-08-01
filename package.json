@@ -1,0 +1,31 @@
+{
+  "name": "greymind-sequencer",
+  "version": "1.7.1",
+  "description": "Greymind Sequencer for Maya",
+  "main": " ",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bsrealm/GreymindSequencer.git"
+  },
+  "keywords": [
+    "Greymind",
+    "Sequencer",
+    "Balki",
+    "Maya",
+    "Python"
+  ],
+  "author": "Balakrishnan <balki@live.com> (Balki)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bsrealm/GreymindSequencer/issues"
+  },
+  "homepage": "https://github.com/bsrealm/GreymindSequencer#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "rimraf": "^2.4.2"
+  }
+}
