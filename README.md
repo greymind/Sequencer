@@ -33,3 +33,6 @@ delete SequencerData;
 ## Team
 * Balakrishnan (Balki) Ranganathan
 * Scott John Easley
+
+## License
+MIT
