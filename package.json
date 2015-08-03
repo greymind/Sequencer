@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/greymind/sequencer.git"
+    "url": "git+https://github.com/greymind/Sequencer.git"
   },
   "keywords": [
     "Greymind",
@@ -24,9 +24,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/greymind/GreymindSequencer/issues"
+    "url": "https://github.com/greymind/Sequencer/issues"
   },
-  "homepage": "https://github.com/greymind/GreymindSequencer#readme",
+  "homepage": "https://github.com/greymind/Sequencer#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
