@@ -1,6 +1,6 @@
 '''
 Greymind Sequencer for Maya
-Version: 1.7.2
+Version: 1.8.0
 
 (c) 2009 - 2015 Greymind Inc.
     Balakrishnan (Balki) Ranganathan (balki_live_com)
@@ -10,7 +10,7 @@ Version: 1.7.2
 # from Common import *
 from functools import partial as Partial
 
-SequencerVersion = "1.7.2"
+SequencerVersion = "1.8.0"
 
 class Animation:
     Id = -1
@@ -141,6 +141,7 @@ class SequencerUI:
     width = 0
     height = 0
     sequencer = None
+    IncludePlayblastLinkCheckBox = None
     
     AnimationUIs = {}
     
@@ -372,6 +373,13 @@ class SequencerUI:
         
     def MessageBox(self, dialogMessage, dialogTitle = "Sequencer", dialogButtons=["Ok"]):
         Cmds.confirmDialog(title=dialogTitle, message=dialogMessage, button=dialogButtons)
+        
+    def InputBox(self, dialogMessage, defaultText="", dialogTitle = "Sequencer", dialogButtons=["Ok", "Cancel"]):
+        result = Cmds.promptDialog(title=dialogTitle, message=dialogMessage, text=defaultText, button=dialogButtons, defaultButton="OK", cancelButton="Cancel", dismissString="Cancel")
+        if result == "Ok":
+            return Cmds.promptDialog(query=True, text=True)
+        
+        return ""
     
     def CountSelected(self):
         selectedCount = 0
@@ -429,7 +437,7 @@ class SequencerUI:
         Cmds.setAttr('persp.displayFieldChart', enable)
         Cmds.setAttr('persp.displayResolution', enable)
         Cmds.setAttr('persp.displayFilmGate', enable)
-        
+    
     def Export(self, extraArg=None):
         directoryName = os.path.dirname(Cmds.file(q=True, sn=True))
         if not directoryName:
@@ -440,15 +448,37 @@ class SequencerUI:
         if selectedCount == 0:
             self.MessageBox('Please select animations to export!')
             return
+        
+        includePlayblastLink = Cmds.checkBox(self.IncludePlayblastLinkCheckBox, q=True, value=True)
+        
+        playblastFolder = ""
+        if includePlayblastLink:
+            playblastFolder = self.InputBox("Enter directory that contains the playblasts", directoryName)
+            if not playblastFolder:
+                self.MessageBox("Please enter a playblast folder. Export canceled.")
+                return
             
+            playblastPrefix = self.InputBox("Enter prefix (if any)")
+        
         now = datetime.datetime.now()
         exportFilename = "%s/Export %d%d%d-%d%d%d.csv" % (directoryName, now.year, now.month, now.day, now.hour, now.minute, now.second)
         exportFile = open(exportFilename, "w")
         
-        exportFile.write("%s, %s, %s\n" % ('Animation Name', 'Start Frame', 'End Frame'))
+        if not includePlayblastLink:
+            exportFile.write("%s,%s,%s\n" % ('Animation Name', 'Start Frame', 'End Frame'))
+        else:
+            exportFile.write("%s,%s,%s,%s\n" % ('Animation Name', 'Start Frame', 'End Frame', 'Playblast'))
+        
         for animation in self.sequencer.Animations.values():
             if animation.Selected == True:
-                exportFile.write("%s, %d, %d\n" % (animation.Name, animation.StartFrame, animation.EndFrame))
+                if not includePlayblastLink:
+                    exportFile.write("%s,%d,%d\n" % (animation.Name, animation.StartFrame, animation.EndFrame))
+                else:
+                    playblastLink = "%s.avi" % self.GetPlayblastMovieFilename(playblastFolder, playblastPrefix, animation)
+                    if os.path.isfile(playblastLink):
+                        exportFile.write("%s,%d,%d,\"=HYPERLINK(\"\"%s\"\", \"\"[open]\"\")\"\n" % (animation.Name, animation.StartFrame, animation.EndFrame, playblastLink))
+                    else:
+                        exportFile.write("%s,%d,%d,n/a\n" % (animation.Name, animation.StartFrame, animation.EndFrame))
         
         exportFile.close()
         
@@ -493,12 +523,18 @@ class SequencerUI:
             if animation.Selected == True:
                 self.SetPlaybackRange(animation.StartFrame, animation.EndFrame)
                 
-                movieFilename = "%s/%s%s" % (directoryName, prefixText, animation.Name.replace("\"", "_").replace("*", "_"))
+                movieFilename = self.GetPlayblastMovieFilename(directoryName, prefixText, animation)
                 Cmds.playblast(format='movie', filename=movieFilename, clearCache=True, viewer=False, showOrnaments=True, fp=4, percent=scalePercentage, compression='none', widthHeight=(horizontalResolution, verticalResolution), fo=True)
                 self.StepProgressBar(1)
         
         self.EndProgressBar()
         self.MessageBox('Playblast generation complete!')
+
+    def GetPlayblastMovieFilename(self, directoryName, prefixText, animation):
+        assert(directoryName)
+        assert(animation)
+        
+        return "%s/%s%s" % (directoryName, prefixText, animation.Name.replace("\"", "_").replace("*", "_"))
         
     def BakeKeys(self, extraArg=None):
         selection = Cmds.ls(selection=True)
@@ -681,7 +717,6 @@ class SequencerUI:
         Cmds.button(label='Move Up', c=Partial(self.MoveUp))
         Cmds.button(label='Move Down', c=Partial(self.MoveDown))
         Cmds.button(label='Refresh', backgroundColor=[0.6, 0.6, 0.9], c=Partial(self.Refresh))
-        Cmds.button(label='Export', backgroundColor=[0.6, 0.6, 0.9], c=Partial(self.Export))
         
         self.CreateSeparator()
         
@@ -701,6 +736,12 @@ class SequencerUI:
         Cmds.rowLayout(numberOfColumns = 2, columnWidth2=[200, 48], columnAlign2=['left', 'left'])
         Cmds.text(label=' To generate multiple playblasts')
         Cmds.button(label='PlayBlast', c=Partial(self.GeneratePlayblast), backgroundColor=[0.9, 0.9, 0.8])
+        
+        Cmds.setParent('..')
+        Cmds.rowLayout(numberOfColumns = 3, columnWidth3=[200, 90, 48], columnAlign3=['left', 'left', 'left'])
+        Cmds.text(label=' To export animation list as CSV')
+        Cmds.button(label='Export to CSV', c=Partial(self.Export), backgroundColor=[0.9, 0.9, 0.8])
+        self.IncludePlayblastLinkCheckBox = Cmds.checkBox(label='playblast link')
         
         Cmds.setParent('..')
         Cmds.rowLayout(numberOfColumns = 2, columnWidth2=[200, 48], columnAlign2=['left', 'left'])

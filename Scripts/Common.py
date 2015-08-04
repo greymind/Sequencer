@@ -14,6 +14,7 @@ import math
 import shutil
 import fnmatch
 import datetime
+import glob
 import maya.cmds as Cmds
 import maya.mel as Mel
 import xml.dom.minidom as Dom
